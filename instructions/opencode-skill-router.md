@@ -63,6 +63,34 @@ user-invoked skill
     -> user-invoked skill
 ```
 
+## Instruction Dependencies
+
+`SOLID Development Rules` controls engineering-quality constraints for design,
+implementation, refactoring, testing, debugging, and review. Read and apply
+`instructions/solid-development-rules.md` before invoking
+`improve-codebase-architecture`, `domain-modeling`, `codebase-design`,
+`implement`, `tdd`, `diagnosing-bugs`, or `code-review`.
+
+For direct refactoring, use these observable branches:
+
+- Seam or interface refactoring: apply `SOLID Development Rules`, then invoke
+  `codebase-design`.
+- Behavior-changing refactoring: apply `SOLID Development Rules`, then invoke
+  `tdd`.
+- Behavior-preserving direct refactoring: apply `SOLID Development Rules`,
+  perform the refactoring under those rules, then return to the router without inventing a task skill.
+
+```text
+ROUTER
+-> SOLID Development Rules
+-> task-specific skill
+-> ROUTER
+```
+
+This dependency wraps the selected execution step; it does not replace its
+route or own its `HOW`. Do not activate it for unrelated writing, teaching,
+research-only, setup, handoff, or questionnaire routes.
+
 ## Routing Loop
 
 For every request:
