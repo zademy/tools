@@ -1,40 +1,42 @@
 # Zread MCP
 
-Usa `zread` para investigar repositorios públicos de GitHub y comprender su documentación, estructura y código fuente.
+Use Zread for public GitHub repository research.
 
-## Herramientas disponibles
+Use `zread` to understand a public repository's documentation, structure, and source code.
 
-- `search_doc`: busca documentación, código, comentarios, noticias, issues, commits, PRs y colaboradores relacionados con un repositorio.
-- `get_repo_structure`: obtiene la estructura de directorios y archivos de un repositorio o subdirectorio.
-- `read_file`: lee el contenido completo de un archivo específico.
+## Available Tools
 
-## Cuándo usarlo
+- `search_doc`: searches documentation, code, comments, news, issues, commits, PRs, and contributors related to a repository.
+- `get_repo_structure`: retrieves the directory and file structure of a repository or subdirectory.
+- `read_file`: reads the full content of a specific file.
 
-- Para comprender una librería o proyecto de código abierto alojado en GitHub.
-- Para localizar la implementación de una clase, función, módulo o característica.
-- Para revisar la arquitectura y organización de un repositorio.
-- Para investigar issues, cambios recientes o decisiones documentadas del proyecto.
-- Para leer archivos concretos antes de proponer una integración, corrección o refactorización.
+## When to Use It
 
-## Flujo recomendado
+- To understand an open-source library or project hosted on GitHub.
+- To locate the implementation of a class, function, module, or feature.
+- To review a repository's architecture and organization.
+- To investigate issues, recent changes, or documented project decisions.
+- To read specific files before proposing an integration, fix, or refactoring.
 
-1. Identifica el repositorio con formato `owner/repo`.
-2. Usa `search_doc` para obtener una visión general o localizar conceptos relevantes.
-3. Usa `get_repo_structure` para conocer la organización del proyecto y encontrar rutas exactas.
-4. Usa `read_file` únicamente cuando exista una ruta concreta y relevante.
-5. Relaciona los hallazgos con archivos, módulos y símbolos específicos.
-6. Para una investigación profunda, repite el ciclo de búsqueda, estructura y lectura solo en las áreas necesarias.
-7. Explica qué proviene del repositorio y qué corresponde a una inferencia técnica.
+## Recommended Workflow
 
-## Reglas
+1. Identify the repository in exact `owner/repo` format.
+2. Use `search_doc` for an overview or to locate relevant concepts.
+3. Use `get_repo_structure` to understand project organization and find exact paths.
+4. Use `read_file` only when a concrete, relevant path is known.
+5. Relate findings to specific files, modules, and symbols.
+6. For deeper research, repeat the search-structure-read cycle only in the necessary areas.
+7. Explain what comes from the repository and what is a technical inference.
 
-- Trabaja únicamente con repositorios públicos compatibles con Zread.
-- No inventes rutas, archivos, clases, funciones ni comportamiento.
-- No leas archivos grandes sin haber reducido primero el alcance.
-- No uses `read_file` sin una ruta suficientemente precisa.
-- Prioriza archivos fuente, documentación oficial del repositorio, pruebas y configuración.
-- Cuando existan varias implementaciones, identifica cuál corresponde a la versión o rama analizada.
-- No uses Zread para archivos locales del proyecto actual.
-- No uses Zread para páginas web generales; utiliza `web-reader`.
-- No uses Zread para búsquedas generales de Internet; utiliza `web-search-prime`.
-- No incluyas tokens, credenciales ni información privada en las consultas.
+## Rules
+
+- Work only with public repositories supported by Zread.
+- Do not invent paths, files, classes, functions, or behavior.
+- Do not read large files before narrowing the scope.
+- Do not use `read_file` without a sufficiently precise path.
+- Prefer source files, official repository documentation, tests, and configuration.
+- When multiple implementations exist, identify which one matches the version or branch being analyzed.
+- Do not use Zread for local files in the current project.
+- Do not use Zread for general web pages; use `web-reader`.
+- Do not use Zread for general Internet searches; use `web-search-prime`.
+- Do not include tokens, credentials, or private information in queries.

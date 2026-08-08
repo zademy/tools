@@ -1,34 +1,36 @@
 # Web Search Prime MCP
 
-Usa `web-search-prime` para localizar información pública, reciente y verificable en Internet.
+Use Web Search Prime when the source URL is not yet known.
 
-## Herramienta disponible
+Use `web-search-prime` to locate public, current, verifiable information on the Internet.
 
-- `webSearchPrime`: realiza búsquedas web y devuelve títulos, URLs, resúmenes y datos del sitio.
+## Available Tool
 
-## Cuándo usarlo
+- `webSearchPrime`: searches the web and returns titles, URLs, summaries, and site data.
 
-- Cuando el usuario solicite buscar, investigar, verificar o consultar información actual.
-- Para noticias, versiones recientes, cambios de APIs, errores conocidos, disponibilidad de servicios y documentación vigente.
-- Cuando todavía no se conoce la URL exacta de la fuente.
-- Para encontrar fuentes oficiales antes de implementar una solución técnica.
+## When to Use It
 
-## Flujo recomendado
+- When the user asks to search, investigate, verify, or consult current public information.
+- For news, recent versions, API changes, known errors, service availability, and current documentation.
+- When the source's exact URL is not yet known.
+- To find official sources before implementing a technical solution.
 
-1. Convierte la solicitud en una consulta concreta y breve.
-2. Incluye nombres oficiales, versiones, mensajes de error o fechas cuando estén disponibles.
-3. Prioriza documentación oficial, repositorios oficiales, especificaciones y fuentes primarias.
-4. Si los resultados son ambiguos, refina la búsqueda en lugar de asumir.
-5. Cuando una afirmación dependa del contenido completo de una página, abre la URL con `web-reader`.
-6. Resume únicamente la información respaldada por los resultados encontrados.
+## Recommended Workflow
 
-## Reglas
+1. Convert the request into a concrete, concise query.
+2. Include official names, versions, error messages, or dates when available.
+3. Prefer official documentation, official repositories, specifications, and primary sources.
+4. If results are ambiguous, refine the search instead of assuming.
+5. When a claim depends on a page's full content, open the URL with `web-reader`.
+6. Summarize only information supported by the results found.
 
-- No inventes resultados, URLs, versiones ni características.
-- No presentes el resumen de búsqueda como si fuera el contenido completo de una página.
-- Para información crítica, compara más de una fuente confiable.
-- Distingue claramente entre hechos encontrados e inferencias propias.
-- No incluyas API keys, tokens, contraseñas, datos personales ni código confidencial en las consultas.
-- No uses esta herramienta para leer el código de un repositorio; utiliza `zread`.
-- No uses esta herramienta cuando ya exista una URL concreta que deba leerse; utiliza `web-reader`.
-- Evita búsquedas repetidas que no aporten información nueva.
+## Rules
+
+- Do not invent results, URLs, versions, or features.
+- Do not present a search summary as though it were the full content of a page.
+- Corroborate critical information with more than one reliable source.
+- Clearly distinguish found facts from your own inferences.
+- Do not include API keys, tokens, passwords, personal data, or confidential code in queries.
+- Do not use this tool to read repository code; use `zread`.
+- Do not use this tool when a concrete URL is already available to read; use `web-reader`.
+- Avoid repeated searches that add no new information.

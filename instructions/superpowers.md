@@ -9,19 +9,13 @@ Before any response or action:
 1. Check whether a Superpowers skill applies.
 2. Load every relevant skill with OpenCode's native `skill` tool.
 3. Follow the loaded skill exactly.
-4. Do not explore files, ask clarifying questions, plan, or modify code before
-   checking applicable skills.
+4. Do not explore files, ask questions, plan, or modify code before checking skills.
 
 When loading a skill, announce it briefly:
 
 `Using <skill> to <purpose>.`
 
-Process skills run before implementation or domain-specific skills.
-
-Before entering plan mode, use `brainstorming` unless a design has already
-been explicitly approved.
-
-If a skill contains a checklist, create matching items with `todowrite`.
+Run process skills before implementation or domain skills. Before plan mode, use `brainstorming` unless design is explicitly approved. Mirror every skill checklist with `todowrite`.
 
 ## Skill Routing
 
@@ -35,8 +29,7 @@ Use before:
 - Starting creative implementation work.
 - Converting an incomplete idea into requirements.
 
-Clarify intent, constraints, alternatives, and acceptance criteria.
-For non-trivial work, present the design and obtain approval before planning.
+Complete when intent, constraints, alternatives, and acceptance criteria are clear; for non-trivial work, the user has approved the design.
 
 ### `systematic-debugging`
 
@@ -48,28 +41,19 @@ Use for:
 - Performance regressions.
 - Build or integration failures.
 
-Find and verify the root cause before proposing or applying a fix.
-Do not guess or apply unrelated speculative changes.
+Complete when evidence verifies the root cause. Only then propose or apply the scoped fix; never guess or make speculative changes.
 
 ### `test-driven-development`
 
 Use when implementing a feature or fixing a bug.
 
-Follow RED-GREEN-REFACTOR:
-
-1. Write the smallest failing test.
-2. Run it and confirm the expected failure.
-3. Implement the smallest correct change.
-4. Run the test and confirm it passes.
-5. Refactor while keeping tests green.
-
-Do not claim TDD when implementation was written before the test.
+Follow the skill's RED-GREEN-REFACTOR workflow. Complete when the intended behavior and relevant suite pass after refactoring. Do not claim TDD when implementation preceded the test.
 
 ### `writing-plans`
 
 Use after requirements and design are approved for multi-step work.
 
-Plans must include:
+Complete when the plan includes:
 
 - Exact files or modules.
 - Small ordered tasks.
@@ -88,11 +72,13 @@ Use before executing substantial feature plans when isolation is useful.
 - Verify the baseline before changing code.
 - Do not use a worktree when the user or repository explicitly forbids it.
 
+Complete when the isolated branch is ready and its baseline passes.
+
 ### `executing-plans`
 
 Use when a written plan must be executed in batches with review checkpoints.
 
-Stop at the defined checkpoints and report evidence before continuing.
+Complete each batch only after stopping at its checkpoint and reporting evidence; finish when all planned batches pass their checkpoints.
 
 ### `subagent-driven-development`
 
@@ -107,14 +93,13 @@ Each task must receive:
 - Acceptance criteria.
 - Verification requirements.
 
-Review specification compliance before code quality.
+Review specification compliance before code quality. Complete when every task meets both reviews and its verification requirements.
 
 ### `dispatching-parallel-agents`
 
 Use when two or more tasks are independent and do not share mutable state.
 
-Do not parallelize tasks with ordering, dependency, or conflicting-file
-requirements.
+Do not parallelize tasks with ordering, dependencies, or conflicting files. Complete when all independent results return to the parent workflow.
 
 ### `requesting-code-review`
 
@@ -130,7 +115,7 @@ Review against:
 - Existing architecture.
 - Unintended changes.
 
-Resolve critical findings before continuing.
+Complete when review covers every listed axis and all critical findings are resolved.
 
 ### `receiving-code-review`
 
@@ -141,6 +126,8 @@ Use before applying review feedback.
 - Reject incorrect feedback with evidence.
 - Do not agree performatively or implement blindly.
 
+Complete when each finding is accepted, rejected with evidence, or clarified before implementation.
+
 ### `verification-before-completion`
 
 Use before stating that work is complete, fixed, passing, or ready.
@@ -150,7 +137,7 @@ Use before stating that work is complete, fixed, passing, or ready.
 - Confirm changed behavior.
 - Report commands not executed or failures encountered.
 
-Evidence before completion claims.
+Complete when current output and exit codes prove changed behavior and disclose every skipped or failed command. Evidence precedes completion claims.
 
 ### `finishing-a-development-branch`
 
@@ -163,13 +150,13 @@ Present the appropriate integration options:
 - Keep the branch.
 - Discard the work.
 
-Do not merge, delete, or discard without user authorization.
+Complete when the user chooses an option. Do not merge, delete, or discard without authorization.
 
 ### `writing-skills`
 
 Use whenever creating, editing, or validating a skill.
 
-Follow the skill format, testing methodology, and trigger-writing guidance.
+Complete when the skill passes its required authoring and behavior tests.
 
 ## OpenCode Tool Mapping
 
@@ -203,10 +190,7 @@ Instruction precedence:
 8. i-have-adhd for response structure.
 9. Caveman `full` for final wording.
 
-Superpowers determines the development process.
-Codebase Memory supplies code intelligence.
-Ponytail keeps implementation minimal.
-Caveman must not remove required reasoning, evidence, or verification.
+Superpowers determines process; Codebase Memory supplies code intelligence; Ponytail minimizes implementation. Caveman must preserve required reasoning, evidence, and verification.
 
 ## Guardrails
 

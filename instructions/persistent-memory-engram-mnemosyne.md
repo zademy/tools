@@ -1,714 +1,90 @@
-# Persistent Memory Protocol — Engram + Mnemosyne
+# Persistent Memory Protocol - Engram + Mnemosyne
 
-This agent has access to two persistent memory systems:
+One fact has one owner:
 
-* **Engram** — project and repository memory.
-* **Mnemosyne** — cross-project user and agent memory.
+- Project or repository facts go to **Engram**.
+- Durable user context that remains useful across projects goes to
+  **Mnemosyne**.
+- Temporary facts are not persisted.
+- Secrets are never persisted.
 
-They have different responsibilities.
-
-Do NOT treat them as redundant memory stores.
-
-The fundamental rule is:
-
-> Engram remembers the project.
-> Mnemosyne remembers durable context that follows the user across projects.
-
-A piece of information should normally have ONE primary memory store.
-
-Do not save the same fact to both systems.
-
----
-
-# 1. Memory Responsibilities
-
-## Engram — Project Memory
-
-Use Engram for knowledge that belongs to the CURRENT repository or project.
-
-Examples:
-
-| Information                                 | Store  |
-| ------------------------------------------- | ------ |
-| Architecture decision                       | Engram |
-| Bug root cause                              | Engram |
-| Important implementation decision           | Engram |
-| Repository convention                       | Engram |
-| Database behavior specific to project       | Engram |
-| Project configuration                       | Engram |
-| Framework limitation affecting this project | Engram |
-| Failed implementation approach              | Engram |
-| Important class/module relationship         | Engram |
-| Current implementation state                | Engram |
-| Project technical debt                      | Engram |
-| Session handoff                             | Engram |
-| Project-specific constraint                 | Engram |
-
-Engram answers:
-
-> What has been learned about this codebase?
-
----
-
-## Mnemosyne — Cross-Project Memory
-
-Use Mnemosyne for durable information that should remain useful even when the user opens another repository.
-
-Examples:
-
-| Information                                              | Store     |
-| -------------------------------------------------------- | --------- |
-| Stable user development preferences                      | Mnemosyne |
-| Preferred coding style                                   | Mnemosyne |
-| Preferred explanation style                              | Mnemosyne |
-| Preferred tools                                          | Mnemosyne |
-| Recurring workflow preferences                           | Mnemosyne |
-| General technology preferences                           | Mnemosyne |
-| Stable constraints that apply across projects            | Mnemosyne |
-| Cross-project conventions requested by the user          | Mnemosyne |
-| Reusable context about how the user wants agents to work | Mnemosyne |
-
-Mnemosyne answers:
-
-> How does this user normally want to work?
-
-and:
-
-> What durable context should follow the agent between projects?
-
----
-
-# 2. Never Blindly Write to Both
-
-Do not mirror memories.
-
-BAD:
-
-Engram:
-
-`User prefers constructor injection.`
-
-Mnemosyne:
-
-`User prefers constructor injection.`
-
-This creates duplicate retrieval, conflicting updates, and memory noise.
-
-Instead decide where the information belongs.
-
-If the user says:
-
-> In all my Java projects, prefer constructor injection.
-
-Store in Mnemosyne.
-
-If the user says:
-
-> In this legacy project use field injection because changing the architecture is out of scope.
-
-Store in Engram.
-
-Both memories may coexist because they represent DIFFERENT facts:
-
-Mnemosyne:
-
-`User generally prefers constructor injection in Java projects.`
-
-Engram:
-
-`This legacy project continues using field injection for compatibility and scope reasons.`
-
-That is valid.
-
----
-
-# 3. Source of Truth Priority
-
-Persistent memory is supporting context, not absolute truth.
-
-Use this priority:
-
-1. Current explicit user instructions
-2. Current repository state
-3. Current tests and runtime evidence
-4. Current project configuration
-5. Engram project memory
-6. Mnemosyne cross-project memory
-7. Agent assumptions
-
-Never modify correct current code merely because an old memory says something different.
-
----
-
-# 4. Starting Work
-
-When beginning meaningful work in a repository, identify the Engram project first.
-
-Use:
-
-`mem_current_project`
-
-Then recover recent project context:
-
-`mem_context`
-
-This should normally be the first persistent-memory recovery mechanism for repository work.
-
-Do NOT automatically query Mnemosyne on every turn.
-
-Use Mnemosyne when cross-project or user-specific context could materially affect the task.
-
-Examples:
-
-* preferred coding style;
-* preferred architecture style;
-* preferred testing approach;
-* preferred response format;
-* recurring development conventions;
-* previous cross-project decisions.
-
-Use:
-
-`mnemosyne_recall`
-
-only when that information is relevant.
-
----
-
-# 5. Retrieval Routing
-
-Before searching memory, classify the question.
-
-## Project-specific question
-
-Examples:
-
-* Why does this repository use JdbcTemplate?
-* Did we already fix this Hibernate issue?
-* How is authentication implemented here?
-* Why is this dependency pinned?
-* What was the previous implementation decision?
-
-Search Engram first:
-
-`mem_search`
-
-If more detail is required:
-
-`mem_get_observation`
-
-If historical evolution matters:
-
-`mem_timeline`
-
----
-
-## User or cross-project question
-
-Examples:
-
-* What Java style does the user prefer?
-* Does the user normally want tests added?
-* What architecture style does the user usually prefer?
-* How does the user like technical explanations?
-* Is there a recurring convention used across repositories?
-
-Use:
-
-`mnemosyne_recall`
-
----
-
-## Ambiguous question
-
-If it could involve both:
-
-Search Engram first when currently inside a repository.
-
-Then use Mnemosyne only if broader user context would improve the decision.
-
-Do not query both systems mechanically.
-
----
-
-# 6. Search Before Re-Investigating
-
-Before spending significant time rediscovering:
-
-* previous bugs;
-* architectural decisions;
-* unusual configuration;
-* framework limitations;
-* database behavior;
-* implementation history;
-* failed approaches;
-
-search Engram.
-
-Before asking the user again about a stable development preference that may already be known:
-
-search Mnemosyne.
-
-Memory should reduce repeated investigation and repeated questions.
-
----
-
-# 7. Saving to Engram
-
-Use:
-
-`mem_save`
-
-after durable PROJECT knowledge is discovered.
-
-Good Engram memories include:
-
-* architecture decisions;
-* bug fixes;
-* root causes;
-* important discoveries;
-* configuration decisions;
-* reusable repository patterns;
-* project constraints;
-* non-obvious behavior;
-* failed approaches worth avoiding.
-
-Do not save routine activity.
-
-Engram is not a tool-call log.
-
-Do NOT save:
-
-* every file opened;
-* every command executed;
-* trivial edits;
-* formatting;
-* imports;
-* temporary debugging;
-* ordinary test output;
-* speculative hypotheses;
-* status updates.
-
----
-
-# 8. Engram Memory Format
-
-Prefer structured, concise observations.
-
-Use:
-
-**What:** what was decided, fixed, or discovered.
-
-**Why:** why it matters.
-
-**Where:** relevant files, classes, modules, services, tables, or configuration.
-
-**Learned:** caveats, limitations, failed approaches, or future implications.
-
-Example:
+Do not mirror a fact across systems. Engram is the repository brain;
+Mnemosyne is durable cross-project user context.
 
 ```text
-Title:
-Product report uses DTO projection
-
-What:
-Product reporting uses a DTO projection instead of loading Product entities.
-
-Why:
-Entity hydration produced unnecessary joins and increased memory consumption.
-
-Where:
-ProductoRepository
-ProductoReportService
-
-Learned:
-Do not replace the projection with EntityGraph unless the report starts requiring complete related entities.
+                    OpenCode Agent
+                         │
+           ┌─────────────┴─────────────┐
+           │                           │
+           ▼                           ▼
+        ENGRAM                     MNEMOSYNE
+           │                           │
+    Repository Brain              User Brain
+           │                           │
+    Current project               Cross-project
+    architecture                  preferences
+    decisions                     workflows
+    bugs                          conventions
+    discoveries                   stable context
+    constraints
+    session state
 ```
 
----
-
-# 9. Evolving Engram Knowledge
-
-Project architecture evolves.
-
-When an existing project decision changes, avoid creating disconnected contradictory observations.
-
-Use stable `topic_key` values when appropriate.
-
-Examples:
-
-`architecture/authentication`
-
-`architecture/database-access`
-
-`architecture/session-management`
-
-`config/keycloak`
-
-`pattern/error-handling`
-
-`decision/api-pagination`
-
-Use:
-
-`mem_suggest_topic_key`
-
-when a stable key is needed.
-
-Use:
-
-`mem_update`
-
-when an existing observation should be corrected or refined.
-
-If Engram detects a possible conflict and requests judgment, use:
-
-`mem_judge`
-
-after validating the current repository evidence.
-
----
-
-# 10. Saving to Mnemosyne
-
-Use:
-
-`mnemosyne_remember`
-
-only for durable information that should remain useful beyond the current repository.
-
-Good Mnemosyne memories include statements such as:
-
-`User generally prefers constructor injection in Spring projects.`
-
-`User prefers examples using Java when discussing backend patterns.`
-
-`User prefers technical explanations that include concrete implementation examples.`
-
-`User normally wants local-first development tools when possible.`
-
-`User prefers avoiding unnecessary dependencies.`
-
-These are cross-project preferences or recurring working patterns.
-
----
-
-# 11. Do Not Put Project Details in Mnemosyne
-
-Avoid memories such as:
-
-`ProductoService currently has an N+1 issue.`
-
-`This repository uses PostgreSQL 18.`
-
-`AuthenticationController was refactored today.`
-
-`The payment API timeout was caused by RetryService.`
-
-These belong in Engram.
-
-Otherwise Mnemosyne eventually becomes polluted with details from unrelated repositories.
-
----
-
-# 12. Do Not Put General User Memory in Engram
-
-Avoid using Engram as the primary store for statements such as:
-
-`User prefers Java examples.`
-
-`User likes detailed architecture explanations.`
-
-`User generally prefers local tools.`
-
-These belong in Mnemosyne when they are durable and genuinely useful across projects.
-
-Project-specific exceptions may still belong in Engram.
-
----
-
-# 13. Cross-Project Knowledge vs Project Knowledge
-
-Use this test:
-
-Ask:
-
-> Would this fact still matter if the user opened a completely different repository tomorrow?
-
-If NO:
-
-→ Engram.
-
-If YES:
-
-Ask:
-
-> Is this a durable user preference, recurring workflow rule, or cross-project context?
-
-If YES:
-
-→ Mnemosyne.
-
-If neither:
-
-→ Do not persist it.
-
----
-
-# 14. One Fact, One Owner
-
-Every durable fact should have a primary owner.
-
-Use:
-
-PROJECT FACT
-→ Engram
-
-USER / CROSS-PROJECT FACT
-→ Mnemosyne
-
-TEMPORARY FACT
-→ Do not persist
-
-SECRET
-→ Never persist
-
-This rule is mandatory.
-
----
-
-# 15. Handling Information That Contains Both
-
-Sometimes one user statement contains both general and project-specific information.
-
-Example:
-
-> I normally prefer WebFlux, but this application must stay MVC because it runs on Spring Boot 1.4.1.
-
-Split the knowledge.
-
-Mnemosyne:
-
-`User generally prefers reactive/WebFlux approaches when technically appropriate.`
-
-Engram:
-
-`This project must remain Spring MVC because it runs on Spring Boot 1.4.1 and migration is outside the current scope.`
-
-Do not copy the complete statement into both memories.
-
-Extract the appropriate fact for each system.
-
----
-
-# 16. Conflict Between Engram and Mnemosyne
-
-A cross-project preference may conflict with a project constraint.
-
-Example:
-
-Mnemosyne:
-
-`User prefers constructor injection.`
-
-Engram:
-
-`Legacy framework in this project requires the existing field-injection pattern to remain unchanged.`
-
-For the current repository:
-
-Engram's project constraint wins.
-
-Do NOT delete the Mnemosyne preference.
-
-It may still apply to other projects.
-
-Explain or apply the local exception when relevant.
-
----
-
-# 17. Outdated Mnemosyne Preferences
-
-If the user explicitly changes a durable preference, the new explicit instruction takes precedence immediately.
-
-Example:
-
-Old:
-
-`User prefers Maven.`
-
-New user instruction:
-
-`From now on I prefer Gradle.`
-
-The current user instruction wins.
-
-Update the persistent knowledge using the Mnemosyne tools available at runtime.
-
-If replacing old memory requires `mnemosyne_forget`, only remove the old memory when the target is unambiguous.
-
-Then store the new preference using:
-
-`mnemosyne_remember`
-
-Do not perform broad deletion.
-
----
-
-# 18. Mnemosyne Forget Policy
-
-Treat:
-
-`mnemosyne_forget`
-
-as a destructive operation.
-
-Use it conservatively.
-
-Appropriate cases:
-
-* user explicitly requests forgetting;
-* incorrect memory was stored;
-* a stable preference was explicitly replaced;
-* sensitive information was accidentally persisted;
-* an exact harmful duplicate can safely be identified.
-
-Do not delete memory merely because it is old.
-
-Do not broadly delete memories based on vague matches.
-
----
-
-# 19. Session State Belongs to Engram
-
-Use Engram for repository session continuity.
-
-Before finishing meaningful repository work, use:
-
-`mem_session_summary`
-
-Capture:
-
-**Goal**
-
-What was being attempted.
-
-**Accomplished**
-
-What was completed.
-
-**Decisions**
-
-Important decisions.
-
-**Discoveries**
-
-Non-obvious knowledge.
-
-**Current State**
-
-Where implementation stands.
-
-**Remaining Work**
-
-What remains.
-
-**Next Steps**
-
-Recommended continuation.
-
-**Important Locations**
-
-Relevant classes, files, modules, configuration, or services.
-
-Mnemosyne should NOT receive a duplicate session summary.
-
----
-
-# 20. After Context Compaction
-
-If conversation context is compacted or lost while working in a repository:
-
-First:
-
-`mem_context`
-
-Then, if necessary:
-
-`mem_search`
-
-Recover project state from Engram.
-
-Only call:
-
-`mnemosyne_recall`
-
-if cross-project/user context is also required.
-
-Do not reconstruct previous decisions from guesses.
-
----
-
-# 21. Sensitive Information
-
-Never persist secrets in either memory system.
-
-Never store:
-
-* passwords;
-* API keys;
-* access tokens;
-* refresh tokens;
-* private keys;
-* cookies;
-* session secrets;
-* database credentials;
-* `.env` secret values;
-* verification codes.
-
-Store only the non-secret conclusion when useful.
-
-Good:
-
-`Payment integration requires PAYMENT_API_TOKEN.`
-
-Bad:
-
-`PAYMENT_API_TOKEN=...`
-
----
-
-# 22. Memory Quality Rule
-
-Before every persistent write, ask two questions.
-
-### Question 1
-
-Will another session benefit from this information?
-
-If NO:
-
-Do not save.
-
-### Question 2
-
-Who owns this knowledge?
-
-If it belongs to this repository:
-
-→ Engram.
-
-If it follows the user across repositories:
-
-→ Mnemosyne.
-
-Do not save without answering both.
-
----
-
-# 23. Operational Strategy
-
-Use this default workflow:
+## Ownership
+
+Engram owns project architecture and implementation decisions, bug root
+causes, repository conventions, project-specific database or framework
+behavior, configuration, constraints, failed approaches, module relationships,
+technical debt, current implementation state, and session handoffs.
+
+Mnemosyne owns stable coding, explanation, tool, architecture, testing, and
+workflow preferences; general technology preferences; cross-project
+constraints and conventions; and reusable context about how the user works.
+
+Before writing, ask:
+
+1. Will another session benefit? If not, do not persist it.
+2. Would it still matter in a completely different repository? If no, use
+   Engram. If yes and it is durable user or cross-project context, use
+   Mnemosyne. Otherwise do not persist it.
+
+For example, `This repository uses PostgreSQL 18.`,
+`ProductoService currently has an N+1 issue.`,
+`AuthenticationController was refactored today.`, and
+`The payment API timeout was caused by RetryService.` belong in Engram.
+`User prefers Java examples.`, `User likes detailed architecture explanations.`,
+and `User generally prefers local tools.` belong in Mnemosyne when durable.
+
+## Source Priority
+
+Memory supports rather than overrides current evidence. Apply this order:
+
+1. Current explicit user instructions.
+2. Current repository state.
+3. Current tests and runtime evidence.
+4. Current project configuration.
+5. Engram project memory.
+6. Mnemosyne cross-project memory.
+7. Agent assumptions.
+
+Never modify correct current code because old memory differs.
+
+## Startup And Retrieval
+
+For meaningful repository work:
+
+1. Run `mem_current_project` to identify the Engram project.
+2. Run `mem_context` to recover recent project context.
+3. For prior project bugs, decisions, configuration, limitations, behavior,
+   history, or failed approaches, run `mem_search`; use
+   `mem_get_observation` for full detail and `mem_timeline` for evolution.
+4. Run `mnemosyne_recall` only when durable user or cross-project context could
+   materially affect the task. Do not query it automatically on every turn.
+
+For ambiguous questions in a repository, search Engram first, then Mnemosyne
+only if broader context improves the decision. Search Engram before repeating
+project investigation; recall Mnemosyne before asking again for a stable user
+preference. Do not query both mechanically.
 
 ```text
 START PROJECT WORK
@@ -753,120 +129,115 @@ MEANINGFUL SESSION COMPLETE
 mem_session_summary
 ```
 
-Do not automatically execute every step when it is unnecessary.
+## Saving To Engram
 
-Memory operations should support development, not dominate it.
+Run `mem_save` after durable project knowledge is discovered: decisions,
+root-cause fixes, important discoveries, configuration, reusable patterns,
+constraints, non-obvious behavior, or failed approaches worth avoiding.
+Engram is not a tool log; omit routine files and commands, trivial edits,
+formatting, imports, temporary debugging, ordinary test output, speculative
+hypotheses, and status updates.
 
----
-
-# 24. Tool Responsibilities
-
-## Engram
-
-Use primarily:
-
-`mem_current_project`
-→ identify current repository memory namespace.
-
-`mem_context`
-→ recover recent repository context.
-
-`mem_search`
-→ search previous project knowledge.
-
-`mem_get_observation`
-→ retrieve full project memory.
-
-`mem_timeline`
-→ inspect project-memory history.
-
-`mem_save`
-→ persist project engineering knowledge.
-
-`mem_update`
-→ evolve existing project knowledge.
-
-`mem_suggest_topic_key`
-→ establish stable evolving topics.
-
-`mem_judge`
-→ resolve detected memory conflicts.
-
-`mem_session_summary`
-→ leave a repository handoff.
-
----
-
-## Mnemosyne
-
-Use:
-
-`mnemosyne_recall`
-→ recover durable user or cross-project context.
-
-`mnemosyne_remember`
-→ preserve durable user or cross-project knowledge.
-
-`mnemosyne_forget`
-→ explicitly and conservatively remove obsolete or unwanted memory.
-
-Do not assume additional Mnemosyne MCP tools exist unless they are actually exposed by the runtime.
-
----
-
-# 25. Final Memory Model
-
-Think about the systems this way:
+Use concise, searchable observations:
 
 ```text
-                    OpenCode Agent
-                         │
-           ┌─────────────┴─────────────┐
-           │                           │
-           ▼                           ▼
-        ENGRAM                     MNEMOSYNE
-           │                           │
-    Repository Brain              User Brain
-           │                           │
-    Current project               Cross-project
-    architecture                  preferences
-    decisions                     workflows
-    bugs                          conventions
-    discoveries                   stable context
-    constraints
-    session state
+Title:
+Product report uses DTO projection
+
+What:
+Product reporting uses a DTO projection instead of loading Product entities.
+
+Why:
+Entity hydration produced unnecessary joins and increased memory consumption.
+
+Where:
+ProductoRepository
+ProductoReportService
+
+Learned:
+Do not replace the projection with EntityGraph unless the report starts requiring complete related entities.
 ```
 
-Engram is the project's engineering memory.
+For evolving project knowledge, reuse a stable `topic_key`, such as
+`architecture/authentication`, `architecture/database-access`,
+`architecture/session-management`, `config/keycloak`,
+`pattern/error-handling`, or `decision/api-pagination`. Use
+`mem_suggest_topic_key` when needed and `mem_update` to correct or refine a
+known observation.
 
-Mnemosyne is the agent's durable cross-project understanding of the user.
+If `mem_save` reports a possible conflict, validate current repository
+evidence and resolve it with `mem_judge` under the Engram conflict protocol.
 
-Do not duplicate them.
+## Saving To Mnemosyne
 
-Use each memory system only for the knowledge it is best suited to preserve.
+Run `mnemosyne_remember` only for durable context useful beyond the current
+repository, for example `User generally prefers constructor injection in Spring projects.`,
+`User prefers examples using Java when discussing backend patterns.`,
+`User prefers technical explanations that include concrete implementation examples.`,
+`User normally wants local-first development tools when possible.`, or
+`User prefers avoiding unnecessary dependencies.`
 
----
+Do not assume Mnemosyne tools beyond those exposed at runtime.
 
-# Core Rule
+## Split Facts And Scope Conflicts
 
-Before rediscovering project knowledge:
+Split statements that contain both scopes. For:
 
-**Search Engram.**
+> I normally prefer WebFlux, but this application must stay MVC because it runs on Spring Boot 1.4.1.
 
-Before asking again about a durable user preference:
+Store `User generally prefers reactive/WebFlux approaches when technically appropriate.`
+in Mnemosyne and
+`This project must remain Spring MVC because it runs on Spring Boot 1.4.1 and migration is outside the current scope.`
+in Engram. Do not copy the whole statement into both systems.
 
-**Recall Mnemosyne.**
+A project constraint overrides a general preference only in that project. For
+example, Engram's
+`Legacy framework in this project requires the existing field-injection pattern to remain unchanged.`
+overrides Mnemosyne's `User prefers constructor injection.` locally. Keep the
+Mnemosyne preference because it may apply elsewhere; explain or apply the local
+exception when relevant. Distinct facts such as
+`User generally prefers constructor injection in Java projects.` and
+`This legacy project continues using field injection for compatibility and scope reasons.`
+may coexist.
 
-After learning something important about the repository:
+## Updating And Forgetting
 
-**Save to Engram.**
+An explicit current preference change takes effect immediately. If
+`User prefers Maven.` becomes `From now on I prefer Gradle.`, update durable
+Mnemosyne knowledge using available tools and store the replacement with
+`mnemosyne_remember`.
 
-After learning something durable about how the user works across repositories:
+Treat `mnemosyne_forget` as destructive. Use it only for an unambiguous target
+when the user requests forgetting, a memory is incorrect, a stable preference
+was replaced, sensitive data was accidentally persisted, or an exact harmful
+duplicate exists. Never broadly delete by vague match or merely because a
+memory is old.
 
-**Remember with Mnemosyne.**
+## Sensitive Information
 
-At the end of meaningful repository work:
+Never store passwords, API keys, access or refresh tokens, private keys,
+cookies, session secrets, database credentials, `.env` secret values, or
+verification codes in either system. Store only a useful non-secret conclusion:
+`Payment integration requires PAYMENT_API_TOKEN.` is valid;
+`PAYMENT_API_TOKEN=...` is not.
 
-**Summarize with Engram.**
+## Compaction Recovery
 
-One fact. One owner. Minimal duplication.
+After context compaction or loss in a repository, save an available compacted
+summary with `mem_session_summary` so pre-compaction work remains durable, then
+run `mem_context` and, when needed, `mem_search`. Recover project state from
+Engram rather than guesses. Run `mnemosyne_recall` only if user or cross-project
+context is also required.
+
+## Session Summary Ownership
+
+Before finishing meaningful repository work, use `mem_session_summary` in
+Engram. Capture **Goal**, **Instructions** when relevant, **Discoveries**,
+**Accomplished**, **Next Steps**, and **Relevant Files**, including decisions,
+current state, remaining work, and important locations. Mnemosyne must not
+receive a duplicate session summary.
+
+Memory operations support development; they do not dominate it. Search Engram
+before rediscovery, recall Mnemosyne before re-asking durable preferences, save
+each durable fact to its one owner, and summarize repository sessions in
+Engram.

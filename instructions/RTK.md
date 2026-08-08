@@ -1,8 +1,10 @@
 # RTK - Rust Token Killer
 
-**Usage**: Token-optimized CLI proxy (cuts up to 90% of bash output)
+Token-optimized CLI proxy. Cuts up to 90% of bash output.
 
-## Meta Commands (always use rtk directly)
+## Meta Commands
+
+Always run these through `rtk` directly:
 
 ```bash
 rtk gain              # Show token savings analytics
@@ -23,7 +25,6 @@ which rtk             # Verify correct binary
 
 ## Hook-Based Usage
 
-All other commands are automatically rewritten by the Claude Code hook.
-Example: `git status` → `rtk git status` (transparent, 0 tokens overhead)
+The Claude Code hook rewrites all other commands automatically: `git status` → `rtk git status` (transparent, 0 tokens overhead).
 
-Refer to CLAUDE.md for full command reference.
+See `CLAUDE.md` for the full command reference.
