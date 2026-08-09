@@ -2,7 +2,11 @@
 
 ## Scope
 
-This router selects and sequences installed `mattpocock/skills`. It owns WHICH SKILL, WHEN, IN WHAT ORDER, WHAT DEPENDS ON WHAT, WHEN CONTROL RETURNS, and WHEN TO STOP. Each selected skill owns its `HOW`.
+This router selects and sequences installed skills from the official
+`mattpocock/skills` repository. It owns WHICH SKILL, WHEN, IN WHAT ORDER, WHAT
+DEPENDS ON WHAT, WHEN CONTROL RETURNS, and WHEN TO STOP. Each selected skill
+owns its `HOW`. Never replace a Matt Pocock skill with a similarly named skill
+from another source.
 
 ```text
 WHICH SKILL
@@ -172,22 +176,22 @@ A specific active state beats a broad workflow. Example:
 | Intent or state | Route |
 |---|---|
 | User asks which skill or flow fits | `ask-matt` |
-| Repository change has unresolved decisions | `grill-with-docs` |
-| Non-repository plan or idea needs grilling | `grill-me` |
+| A working directory exists and the change has unresolved decisions | `grill-with-docs` |
+| No working directory exists and a plan or idea needs grilling | `grill-me` |
 | Incoming issue or external PR needs classification or verification | `triage` |
 | Broad architecture/codebase assessment | `improve-codebase-architecture` |
 | Specific module, interface, seam, or testability design | `codebase-design` |
 | Domain terminology or model is the problem | `domain-modeling` |
 | Required Matt repository setup is missing | `setup-matt-pocock-skills` |
-| Existing discussion should become a spec | `to-spec` |
-| Existing plan or spec should become implementation tickets | `to-tickets` |
-| Existing spec or ticket should be implemented | `implement` |
+| Aligned work spans multiple sessions and should become a durable spec | `to-spec` |
+| A plan or spec spans multiple sessions and should become executable slices | `to-tickets` |
+| Small aligned work fits one context, or an existing spec or ticket should be built | `implement` |
 | Work is both huge and unclear beyond one session | `wayfinder` |
-| Concrete feature or proven fix should be implemented test-first | `tdd` |
+| One concrete behavior is explicitly requested test-first without a full spec | `tdd` |
 | Bug, failure, regression, or slowness has unknown cause | `diagnosing-bugs` |
 | Authoritative external facts are required | `research` |
 | Runnable or visual evidence is required | `prototype` |
-| User requests code, diff, PR, or branch review | `code-review` |
+| Implementation already exists, review evidence is missing, or the user requests an independent review | `code-review` |
 | Git has unresolved merge or rebase conflicts | `resolving-merge-conflicts` |
 | A human-only operation blocks progress | `wizard` |
 | Another person owns missing information | `to-questionnaire` |
@@ -200,57 +204,120 @@ A specific active state beats a broad workflow. Example:
 
 ## Main Routes
 
-Enter the first missing phase, never every phase by default:
+The main Matt Pocock build flow is a conditional decision tree, not a mandatory
+five-skill pipeline. Enter only the first missing phase.
+
+`SOLID Development Rules` is a cross-cutting instruction dependency, not a
+sixth skill and not a substitute for any Matt Pocock skill. Apply it at the
+engineering boundaries defined above; keep the routed skill names and phase
+ownership unchanged.
+
+### Phase 1: choose one grill
+
+Choose from the initial request and current environment before asking the user:
+
+| Evidence | Route |
+|---|---|
+| A working directory or repository exists and the decisions should persist in `CONTEXT.md` or ADRs | `grill-with-docs` |
+| No working directory exists and the interview should remain stateless | `grill-me` |
+
+Both are Matt Pocock front doors over the same `grilling` primitive. Never run
+both for the same alignment phase.
+
+If the environment or desired persistence is genuinely ambiguous, ask one
+question and wait:
 
 ```text
-ROUTER
--> grill-with-docs
+Should this interview persist decisions in the repository with
+grill-with-docs, or remain stateless with grill-me?
+```
+
+After the selected grill reaches shared understanding, return to the router.
+
+```text
+grill-with-docs OR grill-me
+-> ROUTER
+```
+
+### Phases 2 and 3: apply the size gate
+
+Decide whether implementation is single-session or multi-session. Use expected
+coordination and context boundaries, not file count or guessed lines of code.
+
+Treat work as multi-session when one or more of these are true:
+
+- the build cannot reasonably fit one fresh context window;
+- it needs multiple independently verifiable tracer-bullet slices;
+- dependencies require several implementation sessions or handoffs;
+- the user needs a durable tracker artifact for coordination.
+
+If none applies and the aligned change can be built in the current context,
+treat it as single-session. If evidence is still insufficient, ask whether the
+work must fit one implementation session or be split across sessions.
+
+Multi-session route:
+
+```text
+selected grill
 -> ROUTER
 -> to-spec
 -> ROUTER
 -> to-tickets
 -> ROUTER
+-> implement one ticket per fresh session
+-> ROUTER
+-> review gate
+```
+
+Single-session route:
+
+```text
+selected grill
+-> ROUTER
+-> implement
+-> ROUTER
+-> review gate
+```
+
+Skip `to-spec` and `to-tickets` for the single-session route. Do not create
+ceremony merely because the full chain exists.
+
+Skills never chain the multi-session route directly:
+
+```text
+grill-with-docs OR grill-me
+-> to-spec
+-> to-tickets
 -> implement
 ```
 
-Skills never chain this route directly:
+Every user-invoked skill returns to the router first. The router then rechecks
+the original objective, completed artifacts, and size gate.
+
+### Phase 4: implement from the closest valid artifact
+
+Direct entries skip phases already satisfied:
 
 ```text
-grill-with-docs
+aligned conversation + single-session build
+-> implement in the same context
+```
+
+```text
+aligned conversation + multi-session build
 -> to-spec
+-> ROUTER
 -> to-tickets
+```
+
+```text
+spec already exists + multi-session build
+-> to-tickets
+```
+
+```text
+spec already exists + single-session build
 -> implement
-```
-
-The complete review route retains router boundaries:
-
-```text
-grill-with-docs
--> ROUTER
--> to-spec
--> ROUTER
--> to-tickets
--> ROUTER
--> implement
--> ROUTER
--> code-review
-```
-
-Direct entries:
-
-```text
-idea unclear
--> grill-with-docs
-```
-
-```text
-decisions already settled
--> to-spec
-```
-
-```text
-spec already exists
--> to-tickets
 ```
 
 ```text
@@ -258,14 +325,41 @@ tickets already exist
 -> implement
 ```
 
+Run `implement` once per ticket. Each ticket gets a fresh context after
+`to-tickets`; respect its blocking edges.
+
+Use `tdd` directly only for one concrete behavior explicitly requested
+test-first without a full spec. Ordinary small aligned implementation uses
+`implement`, which drives `tdd` internally.
+
+### Phase 5: verify review completion
+
+`implement` is expected to close with Matt Pocock's `code-review`. After it
+returns, always evaluate Phase 5. Inspect the evidence instead of blindly
+invoking a duplicate review:
+
 ```text
-implementation already exists
--> code-review
+review evidence exists and is complete
+-> phase 5 satisfied
+-> ROUTER
 ```
 
 ```text
-small concrete change
--> tdd
+review evidence is missing OR implementation predates this flow
+OR user requests a fresh independent review
+-> code-review
+-> ROUTER
+```
+
+Never repeat `code-review` when the active `implement` run already completed it,
+unless the user explicitly requests another review or new changes invalidate the
+prior result.
+
+Direct review entry:
+
+```text
+implementation already exists
+-> code-review
 ```
 
 `wayfinder` route:
@@ -341,7 +435,11 @@ improve-codebase-architecture
 -> codebase-design
 ```
 
-After design, use `grill-with-docs` if material decisions remain or `tdd` if implementation is concrete. Use `domain-modeling` only when domain terminology/model decisions are themselves the task.
+After design, use Phase 1 if material decisions remain. If the work is aligned,
+apply the size gate and route to `implement` directly or through `to-spec` and
+`to-tickets`. Use `tdd` directly only for one concrete behavior explicitly
+requested test-first. Use `domain-modeling` only when domain terminology/model
+decisions are themselves the task.
 
 ```text
 codebase-design
@@ -352,7 +450,7 @@ codebase-design
 ```text
 codebase-design
 -> ROUTER
--> tdd
+-> implement
 ```
 
 Domain modeling can stand alone or return to its parent:
@@ -367,21 +465,9 @@ parent workflow
 -> parent workflow
 ```
 
-Interview routing:
-
-```text
-grill-with-docs
-```
-
-```text
-grill-me
-```
-
-```text
-grilling
-```
-
-Never chain `grill-me` and `grill-with-docs`.
+Interview routing follows Phase 1. Use `grilling` directly only when another
+workflow requires the reusable interview primitive. Never chain `grill-me` and
+`grill-with-docs`.
 
 Triage routes incoming work back to the router:
 
@@ -554,13 +640,22 @@ Use no skill for simple factual or syntax questions, short or one-off explanatio
 Minimal routes:
 
 ```text
-idea only
+idea in a working directory
 -> grill-with-docs
 
-alignment complete
+idea without a working directory
+-> grill-me
+
+alignment complete + single-session build
+-> implement
+
+alignment complete + multi-session build
 -> to-spec
 
-spec exists
+spec exists + single-session build
+-> implement
+
+spec exists + multi-session build
 -> to-tickets
 
 tickets exist
@@ -569,11 +664,17 @@ tickets exist
 implementation exists
 -> code-review
 
+implement completed code-review with valid evidence
+-> do not repeat review
+
 bug cause unknown
 -> diagnosing-bugs
 
-bug cause known
--> tdd or implement
+bug cause known + one behavior explicitly requested test-first
+-> tdd
+
+bug cause known + spec, ticket, or aligned implementation objective
+-> implement
 ```
 
 ```text
@@ -597,10 +698,10 @@ grill-with-docs
 ```
 
 ```text
-grill-with-docs
--> to-spec
--> to-tickets
--> implement
+selected grill
+-> ROUTER
+-> size gate
+-> next missing phase
 ```
 
 ```text
