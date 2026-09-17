@@ -1,30 +1,26 @@
-# RTK - Rust Token Killer
+# RTK — Token-Efficient Terminal Output
 
-Token-optimized CLI proxy. Cuts up to 90% of bash output.
+## Role
+RTK is the preferred terminal-output compression layer for supported shell commands. It reduces noisy command output; it does **not** replace the command, compiler, test runner, or build system itself.
 
-## Meta Commands
+## Use RTK For
+- Git status/diff/log output.
+- Build, package-manager, container, Kubernetes, and similar CLI output when RTK supports it.
+- Routine validation commands where concise output is sufficient.
 
-Always run these through `rtk` directly:
+If an installed hook transparently rewrites commands through RTK, do not manually double-wrap them.
 
-```bash
-rtk gain              # Show token savings analytics
-rtk gain --history    # Show command usage history with savings
-rtk discover          # Analyze Claude Code history for missed opportunities
-rtk proxy <cmd>       # Execute raw command without filtering (for debugging)
-```
+## Direct RTK Commands
+Use RTK directly for its own analytics/diagnostic commands such as `rtk gain`, `rtk discover`, version checks, and proxy/debug behavior.
 
-## Installation Verification
+Use `rtk proxy <cmd>` only when exact unfiltered command output is required for diagnosis.
 
-```bash
-rtk --version         # Should show: rtk X.Y.Z
-rtk gain              # Should work (not "command not found")
-which rtk             # Verify correct binary
-```
+## Routing Boundaries
+- Code navigation/architecture → CodeGraph.
+- Durable memory → Engram.
+- Docs → Context7.
+- Web → Web Search Prime / Web Reader.
+- Public GitHub repositories → Zread.
+- Vision → Z.AI Vision.
 
-⚠️ **Name collision**: If `rtk gain` fails, you may have reachingforthejack/rtk (Rust Type Kit) installed instead.
-
-## Hook-Based Usage
-
-The Claude Code hook rewrites all other commands automatically: `git status` → `rtk git status` (transparent, 0 tokens overhead).
-
-See `CLAUDE.md` for the full command reference.
+If terminal output is still very large, requires correlation across many commands, or needs custom parsing/filtering, use **context-mode** instead of forcing RTK to solve a bulk-analysis problem.

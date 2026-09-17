@@ -1,50 +1,23 @@
-# Context7 MCP
+# Context7 — Version-Specific Technical Documentation
 
-Use Context7 to consult current, version-specific documentation when a task involves libraries, frameworks, SDKs, APIs, CLIs, or external services.
+## Role
+Use Context7 for authoritative, version-aware documentation about external libraries, frameworks, SDKs, APIs, CLIs, and services.
 
-## Mandatory Workflow
+## Priority
+For an API/configuration question tied to a dependency version, prefer Context7 before general web search when Context7 covers the technology.
 
-1. Identify the library and its version by inspecting project files such as:
-   - `package.json`
-   - `pom.xml`
-   - `build.gradle`
-   - `requirements.txt`
-   - `pyproject.toml`
-   - Equivalent configuration files.
+Do not use Context7 to understand the application's own business logic or local architecture; use CodeGraph for that.
 
-2. If a Context7 ID has already been provided in this format:
+## Workflow
+1. Determine the dependency/version from the local project configuration when available.
+2. Reuse a known Context7 library ID when reliable; otherwise resolve the library ID.
+3. Select the result matching the official project and relevant version.
+4. Query documentation with a focused technical question.
+5. Split unrelated documentation topics into separate queries.
+6. Implement only APIs/options supported by the retrieved documentation.
 
-   ```text
-   /organizacion/proyecto
-   /organizacion/proyecto/version
-   ```
+## Fallbacks
+- If Context7 coverage is missing, ambiguous, or outdated → use Web Search Prime to find official sources, then Web Reader to inspect them.
+- If the required fact is specifically about implementation, issues, commits, or files in a public GitHub repository → use Zread.
 
-   use it directly.
-
-3. If no known ID exists, call `resolve-library-id` first using:
-   - The official library name.
-   - A concrete description of the task.
-
-4. Select the result that best matches:
-   - The official name.
-   - The version used by the project.
-   - Source reputation.
-   - Documentation coverage.
-   - Relevance to the task.
-
-5. Call `query-docs` with the selected ID and a specific query.
-
-6. Use separate queries for independent topics. For example, query authentication, caching, and routing separately rather than combining them in one request.
-
-7. Implement the solution using only APIs, configurations, and examples supported by the retrieved documentation.
-
-## Rules
-
-- Always prioritize the version used by the project.
-- Do not invent methods, properties, annotations, parameters, or configurations.
-- Do not rely on recalled information when Context7 can verify it.
-- Do not send passwords, tokens, API keys, personal data, or confidential code.
-- Make at most three resolution calls and three documentation queries per task.
-- Do not use Context7 for business logic, simple refactoring, or general concepts that do not depend on external documentation.
-- If the documentation is insufficient, ambiguous, or does not match the version in use, state that clearly instead of assuming.
-- At completion, briefly mention the library and documentation version consulted.
+Never send secrets or confidential source code. Prefer the version actually used by the project and explicitly note uncertainty when documentation does not match it.

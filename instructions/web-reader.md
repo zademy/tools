@@ -1,37 +1,21 @@
-# Web Reader MCP
+# Web Reader — Read a Known Web Source
 
-Use Web Reader when a concrete URL is known.
+## Role
+Use Web Reader when a **specific normal web URL is already known** and its actual page content must be inspected.
 
-Use `web-reader` to read and extract the complete content of that URL.
+## Routing Boundaries
+- No source URL yet → Web Search Prime.
+- Public GitHub repository code, structure, issues, commits, or repository docs → Zread.
+- Version-specific library/API docs available through Context7 → Context7 first, unless the exact web page itself must be verified.
+- Very large page requiring repeated targeted analysis without flooding context → context-mode fetch/index may be preferable.
 
-## Available Tool
+## Workflow
+1. Read the known relevant URL.
+2. Identify the page's main content, date/version, and important warnings.
+3. Extract only sections needed for the task.
+4. Follow links only when they answer a concrete missing question.
+5. Distinguish source statements from technical inference.
 
-- `webReader`: retrieves a web page's title, main content, metadata, and links.
+Prefer official documentation and primary sources. Do not invent content when access is blocked or incomplete, and do not treat menus/metadata as main content.
 
-## When to Use It
-
-- When the user provides a URL.
-- After locating a relevant source with `web-search-prime`.
-- To consult documentation, release notes, technical articles, guides, public READMEs, or reference pages.
-- When the actual page content must be verified rather than relying only on a search summary.
-
-## Recommended Workflow
-
-1. Confirm that the URL points to the relevant source.
-2. Read the page with `webReader`.
-3. Identify the main content, date, version, and applicable warnings.
-4. Extract only the sections related to the task.
-5. Follow internal links only when needed to complete the answer.
-6. Summarize the findings without changing their meaning.
-7. If the page does not contain the answer, use `web-search-prime` to locate another source.
-
-## Rules
-
-- Do not invent content when the page is empty, blocked, or inaccessible.
-- Do not confuse metadata, menus, or navigation links with the main content.
-- Do not follow every link on a page without a specific reason.
-- Prefer official pages and documentation matching the version in use.
-- Distinguish explicit source text from your own inferences.
-- Do not put credentials, tokens, or private information in the URL.
-- Do not use `web-reader` to explore repository structure or files; use `zread`.
-- Do not use `web-reader` to discover sources when no URL is known; use `web-search-prime`.
+Never place credentials, tokens, private identifiers, or confidential information in URLs.

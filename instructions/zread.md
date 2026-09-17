@@ -1,42 +1,23 @@
-# Zread MCP
+# Zread — Public GitHub Repository Research
 
-Use Zread for public GitHub repository research.
+## Role
+Use Zread for **remote public GitHub repository** research: documentation, repository structure, source files, implementation details, issues, commits, pull requests, and related project history.
 
-Use `zread` to understand a public repository's documentation, structure, and source code.
+## Routing Boundaries
+- Current local repository → CodeGraph, not Zread.
+- General Internet discovery → Web Search Prime.
+- Normal known web page → Web Reader.
+- Version-specific consumer documentation → Context7 when available.
+- Durable local project memory → Engram.
 
-## Available Tools
+## Workflow
+1. Identify the exact `owner/repo`.
+2. Search repository content/concepts before reading files broadly.
+3. Inspect repository structure when paths or architecture matter.
+4. Read a file only after a relevant path is known.
+5. Match the branch/version/tag relevant to the task whenever possible.
+6. Distinguish repository evidence from inference.
 
-- `search_doc`: searches documentation, code, comments, news, issues, commits, PRs, and contributors related to a repository.
-- `get_repo_structure`: retrieves the directory and file structure of a repository or subdirectory.
-- `read_file`: reads the full content of a specific file.
+Do not invent paths, symbols, files, or behavior. Narrow scope before reading large files.
 
-## When to Use It
-
-- To understand an open-source library or project hosted on GitHub.
-- To locate the implementation of a class, function, module, or feature.
-- To review a repository's architecture and organization.
-- To investigate issues, recent changes, or documented project decisions.
-- To read specific files before proposing an integration, fix, or refactoring.
-
-## Recommended Workflow
-
-1. Identify the repository in exact `owner/repo` format.
-2. Use `search_doc` for an overview or to locate relevant concepts.
-3. Use `get_repo_structure` to understand project organization and find exact paths.
-4. Use `read_file` only when a concrete, relevant path is known.
-5. Relate findings to specific files, modules, and symbols.
-6. For deeper research, repeat the search-structure-read cycle only in the necessary areas.
-7. Explain what comes from the repository and what is a technical inference.
-
-## Rules
-
-- Work only with public repositories supported by Zread.
-- Do not invent paths, files, classes, functions, or behavior.
-- Do not read large files before narrowing the scope.
-- Do not use `read_file` without a sufficiently precise path.
-- Prefer source files, official repository documentation, tests, and configuration.
-- When multiple implementations exist, identify which one matches the version or branch being analyzed.
-- Do not use Zread for local files in the current project.
-- Do not use Zread for general web pages; use `web-reader`.
-- Do not use Zread for general Internet searches; use `web-search-prime`.
-- Do not include tokens, credentials, or private information in queries.
+When remote findings are used to modify the current project, return to the local toolchain: inspect the local implementation with CodeGraph/current files and validate with the project's real tests/build. RTK may compress terminal validation output; context-mode may process unusually large results.

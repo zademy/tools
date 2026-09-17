@@ -1,35 +1,22 @@
-# Z.AI Vision MCP Server
+# Z.AI Vision — Visual Analysis
 
-Use `zai-mcp-server` to analyze images, screenshots, diagrams, charts, and videos with Z.AI vision capabilities.
+## Role
+Use Z.AI Vision only when the task depends on visual input: screenshots, images, UI references, charts, diagrams, terminal/IDE captures, or video.
 
-## Specialized Tool Selection
+Choose the most specific vision capability available: UI reproduction, exact screenshot text extraction, error diagnosis, technical-diagram interpretation, data-visualization analysis, UI comparison, general image analysis, or video analysis.
 
-- Use `ui_to_artifact` to reproduce a UI or generate code, specifications, prompts, or descriptions from a UI screenshot.
-- Use `extract_text_from_screenshot` to extract exact text, code, documentation, logs, or terminal content from a screenshot.
-- Use `diagnose_error_screenshot` for errors visible in an IDE, terminal, or browser and to propose causes and corrective actions.
-- Use `understand_technical_diagram` to interpret architecture, flow, UML, entity-relationship, and system diagrams.
-- Use `analyze_data_visualization` to analyze charts, dashboards, metrics, trends, and anomalies.
-- Use `ui_diff_check` to compare expected and implemented UI screenshots and identify visual or implementation differences.
-- Use `image_analysis` for general image analysis when no specialized tool fits.
-- Use `video_analysis` to analyze local or remote videos and describe scenes, moments, and entities.
+## Routing Boundaries
+Do not use vision when the same information is directly available from source code, configuration, logs, or documentation.
 
-## Recommended Workflow
-
-1. Verify that the file exists and provide its local path or URL.
-2. Select the most specific tool for the task.
-3. State what to identify and the expected response format.
-4. Separate visible observations from interpretations or hypotheses.
-5. When analyzing a UI, identify its structure, components, states, typography, spacing, and observable behavior.
-6. When diagnosing an error, relate the visible text to the available technical context.
-7. Use `image_analysis` only as a general fallback.
+After visual extraction, hand off by intent when useful:
+- Local code/error path → CodeGraph.
+- External API/library behavior → Context7.
+- Current/public error research → Web Search Prime, then Web Reader.
+- Public GitHub implementation → Zread.
 
 ## Rules
+Use file paths/URLs supported by the server. Separate visible facts from interpretation. Do not invent illegible text or behavior that cannot be observed from a static image.
 
-- In OpenCode, prefer referencing the file path; pasting an image directly may prevent the client from invoking this MCP.
-- Do not invent text that is not legible.
-- State when a conclusion is uncertain or depends on information that is not visible.
-- Do not claim that a UI behaves in a particular way based only on a static screenshot.
-- For `ui_diff_check`, clearly identify the reference image and the candidate image.
-- For videos, use supported formats and respect the server's accepted limit.
-- Do not expose secrets, personal data, or sensitive information present in images or videos.
-- Do not use vision tools for information that can be verified directly in code or documentation.
+For UI comparison, clearly identify reference and candidate. For errors, extract visible evidence before proposing causes.
+
+Do not expose secrets or sensitive information visible in screenshots or videos.
